@@ -1,31 +1,26 @@
 # Stage 1: Build
-FROM eclipse-temurin:17-jdk AS build
+FROM maven:3.9.2-eclipse-temurin-17 AS build
 WORKDIR /app
 
-# Copy Maven wrapper and project files
-COPY mvnw .
-COPY .mvn .mvn
+# Copy only the pom first to leverage Docker cache
 COPY pom.xml .
-RUN chmod +x mvnw
+RUN mvn dependency:go-offline -B
 
-# Download dependencies
-RUN ./mvnw dependency:go-offline
-
-# Copy source code
+# Copy the rest of the project
 COPY src ./src
 
-# Build the JAR
-RUN ./mvnw clean package -DskipTests
+# Build the Spring Boot JAR
+RUN mvn clean package -DskipTests
 
 # Stage 2: Run
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
-# Copy JAR from build stage
+# Copy the jar from the build stage
 COPY --from=build /app/target/*.jar app.jar
 
-# Expose port
+# Expose the port (Render uses environment variable PORT automatically)
 EXPOSE 8080
 
-# Entry point
-ENTRYPOINT ["java","-jar","app.jar"]
+# Run the jar
+ENTRYPOINT ["java", "-jar", "app.jar"]
