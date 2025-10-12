@@ -1,25 +1,30 @@
-# Use official JDK image to build the app
+# Stage 1: Build the Spring Boot application
 FROM eclipse-temurin:17-jdk AS build
 
 WORKDIR /app
 
-# Copy Maven files and download dependencies (for faster builds)
+# Install Maven
+RUN apt-get update && apt-get install -y maven
+
+# Copy pom.xml and download dependencies (cached)
 COPY pom.xml .
-COPY mvnw .
-COPY .mvn .mvn
-RUN ./mvnw dependency:go-offline
+RUN mvn dependency:go-offline
 
-# Copy the project source and build it
+# Copy source code
 COPY src ./src
-RUN ./mvnw clean package -DskipTests
 
-# Use a lightweight JRE image to run the app
+# Build the Spring Boot jar
+RUN mvn clean package -DskipTests
+
+# Stage 2: Run the application
 FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
+
+# Copy the jar from the build stage
 COPY --from=build /app/target/*.jar app.jar
 
-# Expose the default Spring Boot port
+# Expose Spring Boot port
 EXPOSE 8080
 
 # Run the application
