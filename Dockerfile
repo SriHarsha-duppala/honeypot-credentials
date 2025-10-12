@@ -1,31 +1,26 @@
-# ===== Stage 1: Build React frontend =====
-FROM node:18-alpine AS frontend-build
-
-WORKDIR /app/frontend
-COPY frontend/package*.json ./
-RUN npm install
-COPY frontend ./
-RUN npm run build
-
-# ===== Stage 2: Build Spring Boot backend =====
-FROM eclipse-temurin:17-jdk AS backend-build
+# Use official JDK image to build the app
+FROM eclipse-temurin:17-jdk AS build
 
 WORKDIR /app
-COPY backend/pom.xml .
-RUN ./mvnw dependency:go-offline || true
-COPY backend ./
-COPY --from=frontend-build /app/frontend/dist ./src/main/resources/static
 
+# Copy Maven files and download dependencies (for faster builds)
+COPY pom.xml .
+COPY mvnw .
+COPY .mvn .mvn
+RUN ./mvnw dependency:go-offline
+
+# Copy the project source and build it
+COPY src ./src
 RUN ./mvnw clean package -DskipTests
 
-# ===== Stage 3: Runtime image =====
+# Use a lightweight JRE image to run the app
 FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
-COPY --from=backend-build /app/target/*.jar app.jar
+COPY --from=build /app/target/*.jar app.jar
 
-# Set environment variables
-ENV PORT=8080
+# Expose the default Spring Boot port
 EXPOSE 8080
 
+# Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
