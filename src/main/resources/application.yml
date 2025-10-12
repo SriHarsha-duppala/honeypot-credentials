@@ -1,10 +1,9 @@
 spring:
   datasource:
-    url: jdbc:postgresql://dpg-d2nfj97fte5s739chdpg-a.oregon-postgres.render.com:5432/spamdb_gkeb?sslmode=require
-    username: harsha
-    password: 9Wqdwko6WuzFrhF5MuOFh4Twh4gG5IK5
+    url: jdbc:postgresql://dpg-d3lt09qdbo4c73bdcl20-a:5432/sriharsha?sslmode=require
+    username: sriharsha
+    password: v2NR7mARcB5egr5FNZHr4CNWf4WH7y4y
     driver-class-name: org.postgresql.Driver
-
   jpa:
     hibernate:
       ddl-auto: update
@@ -14,4 +13,4 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
 server:
-  port: 8080  # Render automatically sets the PORT environment variable
+  port: ${PORT:8080}  # Render automatically sets the PORT environment variable
