@@ -22,9 +22,10 @@ public class HoneypotController {
 
     @PostMapping("/login")
     public ResponseEntity<?> fakeLogin(@RequestBody Map<String, String> body, HttpServletRequest request) {
-        String username = body.getOrDefault("username", body.getOrDefault("user","")) ;
-        String password = body.getOrDefault("password", body.getOrDefault("pass","")) ;
+    	String username = body.getOrDefault("username", body.getOrDefault("user",""));
+    	String password = body.getOrDefault("password", body.getOrDefault("pass",""));
         String ip = request.getRemoteAddr();
+        System.out.println("Received body: " + body);
 
         CredentialLog log = new CredentialLog();
         log.setUsername(username);
