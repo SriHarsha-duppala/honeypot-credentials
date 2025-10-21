@@ -30,7 +30,7 @@ public class HoneypotController {
                 "username", "shreya@example.com",
                 "password", "shreya@123",
                 "email", "shreya@example.com",
-                "company", "ITsolution",
+                "company", "IT Solutions",
                 "name", "SHREYA",
                 "role", "Engineer",
                 "phone", "+91 90000 00001"
@@ -39,7 +39,7 @@ public class HoneypotController {
                 "username", "chandra@example.com",
                 "password", "chandra@123",
                 "email", "chandrasekhar@101.com",
-                "company", "ITsolution",
+                "company", "IT Solutions",
                 "name", "CHANDRA SEKHAR",
                 "role", "Manager",
                 "phone", "+91 90000 00002"
@@ -48,7 +48,7 @@ public class HoneypotController {
                 "username", "harika@example.com",
                 "password", "harika@123",
                 "email", "harika@example.com",
-                "company", "ITsolution",
+                "company", "IT Solutions",
                 "name", "HARIKA",
                 "role", "DevOps",
                 "phone", "+91 90000 00003"
@@ -57,7 +57,7 @@ public class HoneypotController {
                 "username", "hanuma@example.com",
                 "password", "hanuma@123",
                 "email", "hanuma@example.com",
-                "company", "ITsolution",
+                "company", "IT Solutions",
                 "name", " HANUMA",
                 "role", "Analyst",
                 "phone", "+91 90000 00004"
@@ -66,10 +66,19 @@ public class HoneypotController {
                 "username", "sriharsha@example.com",
                 "password", "sriharsha@123",
                 "email", "sriharsha@example.com",
-                "company", "ITsolution",
+                "company", "IT Solutions",
                 "name", "SRIHARSHA",
                 "role", "Designer",
                 "phone", "+91 90000 00005"
+        ));
+        demoUsers.add(Map.of(
+                "username", "admin@example.com",
+                "password", "admin@2005",
+                "email", "admin@example.com",
+                "company", "IT Solutions",
+                "name", "ADMIN",
+                "role", "Admin",
+                "phone", "+91 90000 00006"
         ));
     }
 
@@ -118,13 +127,29 @@ public class HoneypotController {
     public List<CredentialLog> getAll() {
         return repo.findAll();
     }
-    @GetMapping("/contact")
-    public Map<String, String> getContactInfo() {
-        // You can later update these values dynamically
+    @GetMapping("/contact-info")
+    public ResponseEntity<Map<String, String>> getContactInfo() {
         Map<String, String> contact = new HashMap<>();
-        contact.put("phone", "+91 9000040005"); // your current phone
-        contact.put("email", "info@company.com"); // your current email
-        return contact;
+        contact.put("phone", "+91 90000 00005"); // change later if needed
+        contact.put("email", "support@itsolution.com");
+        return ResponseEntity.ok(contact);
+    }
+ // Delete all credential logs
+    @DeleteMapping("/credentials")
+    public ResponseEntity<Map<String, String>> deleteAllCredentials() {
+        repo.deleteAll();
+        return ResponseEntity.ok(Map.of("message", "All credential logs deleted successfully"));
+    }
+
+    // Delete a specific credential log by ID
+    @DeleteMapping("/credentials/{id}")
+    public ResponseEntity<Map<String, String>> deleteCredentialById(@PathVariable Long id) {
+        if (!repo.existsById(id)) {
+            return ResponseEntity.status(404).body(Map.of("error", "Credential log not found"));
+        }
+        repo.deleteById(id);
+        return ResponseEntity.ok(Map.of("message", "Credential log with ID " + id + " deleted successfully"));
     }
 
 }
+
